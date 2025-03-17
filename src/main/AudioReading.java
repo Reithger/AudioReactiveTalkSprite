@@ -1,10 +1,14 @@
 package main;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Timer;
@@ -14,9 +18,51 @@ public class AudioReading {
 	
 	private static final int PERIODIC_AUDIO_CHECK_TIME = 250;
 	
-	public AudioReading() {
+	private AudioLevelPasser passTo;
+	
+	public AudioReading(AudioLevelPasser reference) {
 		verifyPythonFileNear();
+		passTo = reference;
+		setUpListening();
+	}
+	
+	private void setUpListening() {
+		startLocalListener(passTo);
 		callAudioCheck();
+	}
+	
+	private void startLocalListener(AudioLevelPasser reference){
+		Thread thread = new Thread() {
+			@Override
+			public void run() {
+				ServerSocket server = null;
+				Socket client = null;
+				try {
+					server = new ServerSocket(5439);
+					client = server.accept();
+					BufferedReader receiver = new BufferedReader(new InputStreamReader(client.getInputStream()));
+					String received = receiver.readLine();
+					while(received != null && !received.equals("exit")) {
+						if(!received.equals(""))
+							reference.receiveAudio(Integer.parseInt(received));
+						received = receiver.readLine();
+					}
+				}
+				catch(Exception e) {
+					e.printStackTrace();
+				}
+				finally {
+					try {
+						server.close();
+						client.close();
+					} catch (IOException e) {
+						e.printStackTrace();
+						startLocalListener(reference);
+					}
+				}
+			}
+		};
+		thread.start();
 	}
 	
 	public double getCurrentAudio() {
@@ -85,18 +131,12 @@ public class AudioReading {
 	}
 	
 	private void callAudioCheck() {
-		TimerTask tt = new TimerTask() {
-			@Override
-			public void run() {
-				try {
-					Runtime.getRuntime().exec("python pngassets/read_audio.py");
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		Timer time = new Timer();
-		time.schedule(tt, 15, PERIODIC_AUDIO_CHECK_TIME);
+		try {
+			Runtime.getRuntime().exec("python pngassets/read_audio.py");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }

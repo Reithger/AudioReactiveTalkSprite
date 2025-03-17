@@ -15,7 +15,7 @@ import ui.View;
  * 
  */
 
-public class Controller implements EventProcessor{
+public class Controller implements EventProcessor, AudioLevelPasser{
 	
 //---  Constants   ----------------------------------------------------------------------------
 	
@@ -46,7 +46,7 @@ public class Controller implements EventProcessor{
 	public Controller() {
 		File f = new File(CONFIG_FILE_PATH);
 		f.mkdirs();
-		audio = new AudioReading();
+		audio = new AudioReading(this);
 		view = new View(DEFAULT_WIDTH, DEFAULT_HEIGHT, this);
 		ReadWriteConfig.populateConfigDefaultValues();
 		
@@ -74,21 +74,7 @@ public class Controller implements EventProcessor{
 	}
 	
 //---  Operations   ---------------------------------------------------------------------------
-	
-	public void initiateRegularUpdate() {
-		while(true) {
-			try {
-				Thread.sleep(200);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			double val = audio.getCurrentAudio();
-			Image img = profile.getAppropriateAudioImage((int)val);
-			if(img != null)
-				view.updateSpriteDisplay(img);
-		}
-	}
-	
+
 	public void updateActiveProfile(String profileName) {
 		profile = ReadWriteConfig.readInProfile(profileName);
 		if(ReadWriteConfig.getStatusDefaultProfileAutoset()) {
@@ -109,5 +95,11 @@ public class Controller implements EventProcessor{
 		}
 	}
 
+	@Override
+	public void receiveAudio(int newAudio) {
+		Image img = profile.getAppropriateAudioImage(newAudio);
+		if(img != null)
+			view.updateSpriteDisplay(img);
+	}
 	
 }

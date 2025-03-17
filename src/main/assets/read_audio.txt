@@ -2,21 +2,27 @@ import sounddevice as sd
 import sys
 
 import numpy as np
+import socket
 
 
 loudest = 0
+sender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sender.connect(("127.0.0.1", 5439))
+
 
 def print_sound(indata, outdata, frames, time, status):
     volume_norm = np.linalg.norm(indata)*100
     volume_norm //= 1
     global loudest
     if(volume_norm > loudest):
-        loudest = volume_norm
-
-with sd.Stream(callback=print_sound):
-    sd.sleep(200)
-
-f = open("pngassets/audio_level.txt", "w")
-f.write(str(loudest))
-print(loudest)
-sys.stdout.flush()
+        loudest = int(volume_norm)
+try:
+	while True:
+		with sd.Stream(callback=print_sound):
+		    sd.sleep(200)
+		    sender.send((str(loudest) + "\n").encode("utf-8"))
+		    print(str(loudest))
+		    loudest = 0
+finally:
+	print("Closed")
+	sender.close()
