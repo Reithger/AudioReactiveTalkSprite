@@ -16,8 +16,6 @@ import java.util.TimerTask;
 
 public class AudioReading {
 	
-	private static final int PERIODIC_AUDIO_CHECK_TIME = 250;
-	
 	private AudioLevelPasser passTo;
 	
 	public AudioReading(AudioLevelPasser reference) {
@@ -86,7 +84,7 @@ public class AudioReading {
 	}
 	
 	private void verifyPythonFileNear() {
-		File f = new File("./pngassets/read_audio.py");
+		File f = new File(Controller.CONFIG_FILE_PATH + "/read_audio.py");
 		if(!f.exists()) {
 			try {
 				ArrayList<String> contents = getTemplatePythonContents();
@@ -113,7 +111,7 @@ public class AudioReading {
 		catch(Exception e) {
 			try {
 				File f;
-				f = new File("/assets/read_audio.txt");
+				f = new File(Controller.CONFIG_FILE_PATH + "read_audio.txt");
 				System.out.println(f.getAbsolutePath());
 				sc = new Scanner(f);
 			}
@@ -132,7 +130,7 @@ public class AudioReading {
 	
 	private void callAudioCheck() {
 		try {
-			Runtime.getRuntime().exec("python pngassets/read_audio.py");
+			Runtime.getRuntime().exec("python " + Controller.CONFIG_FILE_PATH + "read_audio.py");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

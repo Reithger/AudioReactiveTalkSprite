@@ -55,6 +55,7 @@ public class ReadWriteConfig {
 	public static void writeProfileToFile(String title, String encoded) throws Exception {
 		File f = new File(Controller.CONFIG_FILE_PATH + "/" + title);
 		f.mkdirs();
+		f = new File(Controller.CONFIG_FILE_PATH + "/" + title + "/" + CONFIG_FILE_NAME);
 		writeFileContents(f, encoded);
 	}
 	
@@ -136,7 +137,7 @@ public class ReadWriteConfig {
 	public static void populateConfigDefaultValues() {
 		try {
 			if(getDefaultProfile() == null)
-				establishDefaultProfile("Some default starter profile");
+				establishDefaultProfile("Default");
 			if(getStatusDefaultProfileAutoset() == null)
 				setStatusDefaultProfileAutoset(true);
 		} catch (Exception e) {
