@@ -33,6 +33,7 @@ public class ReadWriteConfig {
 	public final static String CONFIG_FILE_NAME = "config.txt";
 	public final static String CONFIG_PREFIX_DEFAULT_PROFILE = "DEF_PROFILE";
 	public final static String CONFIG_PREFIX_DEFAULT_SET_AUTO = "DEFAULT_AUTO";
+	public final static String CONFIG_AUDIO_ADJUSTMENT_LEVEL = "AUDIO_ADJ";
 	
 	public final static String CONFIG_KEYWORD_AUTO_SET = "auto";
 	public final static String CONFIG_KEYWORD_MANUAL_SET = "manual";
@@ -140,6 +141,9 @@ public class ReadWriteConfig {
 				establishDefaultProfile("Default");
 			if(getStatusDefaultProfileAutoset() == null)
 				setStatusDefaultProfileAutoset(true);
+			if(getStatusDefaultProfileAutoset() == null) {
+				setAudioAdjustmentLevel(1.0);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -177,6 +181,10 @@ public class ReadWriteConfig {
 		assignConfigData(CONFIG_PREFIX_DEFAULT_SET_AUTO, in ? CONFIG_KEYWORD_AUTO_SET : CONFIG_KEYWORD_MANUAL_SET);
 	}
 	
+	public static void setAudioAdjustmentLevel(double in) throws IOException{
+		assignConfigData(CONFIG_AUDIO_ADJUSTMENT_LEVEL, ""+in);
+	}
+	
 //---  Getter Methods   -----------------------------------------------------------------------
 	
 	public static String getDefaultProfile() {
@@ -206,7 +214,18 @@ public class ReadWriteConfig {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			return false;
+			return null;
+		}
+	}
+	
+	public static Double getAudioAdjustmentLevel() {
+		try {
+			String val = getConfigData(CONFIG_AUDIO_ADJUSTMENT_LEVEL);
+			return Double.parseDouble(val);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
 	}
 	

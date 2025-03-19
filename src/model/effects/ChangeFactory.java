@@ -7,6 +7,8 @@ public class ChangeFactory {
 	public static final String KEYWORD_DARKEN_FILTER = "darken";
 	
 	public static final String KEYWORD_SHAKE_EFFECT = "shake";
+	
+	public static final String KEYWORD_MIRROR_FILTER = "mirror";
 
 	/**
 	 * 
@@ -31,6 +33,8 @@ public class ChangeFactory {
 				return true;
 			case KEYWORD_SHAKE_EFFECT:
 				return false;
+			case KEYWORD_MIRROR_FILTER:
+				return true;
 			default:
 				return false;
 		}
@@ -44,6 +48,8 @@ public class ChangeFactory {
 				return new DarkenFilter(Double.parseDouble(details[0]));
 			case KEYWORD_SHAKE_EFFECT:
 				return new ShakeEffect(Integer.parseInt(details[0]), Integer.parseInt(details[1]));
+			case KEYWORD_MIRROR_FILTER:
+				return new MirrorFilter();
 			default:
 				return null;
 		}

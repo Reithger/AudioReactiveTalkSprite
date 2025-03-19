@@ -1,6 +1,7 @@
 package ui;
 
 import java.awt.Image;
+import java.util.ArrayList;
 
 import main.EventProcessor;
 import main.ImageRetriever;
@@ -8,6 +9,7 @@ import main.ImageRetriever;
 public class View implements ImageRetriever {
 
 	private SpriteDisplay mainWindow;
+	private ConfigDisplay cfgMenu;
 	private EventProcessor eventHandler;
 	
 	public View(int wid, int hei, EventProcessor inEventHandler) {
@@ -29,8 +31,16 @@ public class View implements ImageRetriever {
 	 * 
 	 */
 	
-	public void promptConfigMenu() {
-		//TODO: 
+	public void promptConfigMenu(String activeProf, String defaultProf, ArrayList<String> profiles) {
+		if(cfgMenu == null) {
+			cfgMenu = new ConfigDisplay(300, 500, activeProf, defaultProf, profiles, eventHandler);
+		}
+	}
+	
+	public void refreshConfigMenu(String activeProf, String defaultProf, ArrayList<String> profiles) {
+		if(cfgMenu != null) {
+			cfgMenu.refresh(activeProf, defaultProf, profiles);
+		}
 	}
 	
 	@Override

@@ -11,17 +11,33 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
+
+/**
+ * 
+ * Need to adjust this so that the Port we use is dynamic and we can communicate a different port to the python program.
+ * 
+ */
 
 public class AudioReading {
 	
+//---  Constants   ----------------------------------------------------------------------------
+	
+	private final static int START_PORT = 5439;
+	
+//---  Instance Variables   -------------------------------------------------------------------
+	
 	private AudioLevelPasser passTo;
+	private double audioAdjustment;
 	
 	public AudioReading(AudioLevelPasser reference) {
+		audioAdjustment = 1;
 		verifyPythonFileNear();
 		passTo = reference;
 		setUpListening();
+	}
+	
+	public void setAudioLevelAdjustment(double in) {
+		audioAdjustment = in;
 	}
 	
 	private void setUpListening() {
@@ -36,13 +52,13 @@ public class AudioReading {
 				ServerSocket server = null;
 				Socket client = null;
 				try {
-					server = new ServerSocket(5439);
+					server = new ServerSocket(START_PORT);
 					client = server.accept();
 					BufferedReader receiver = new BufferedReader(new InputStreamReader(client.getInputStream()));
 					String received = receiver.readLine();
 					while(received != null && !received.equals("exit")) {
 						if(!received.equals(""))
-							reference.receiveAudio(Integer.parseInt(received));
+							reference.receiveAudio((int)(audioAdjustment * Integer.parseInt(received)));
 						received = receiver.readLine();
 					}
 				}
@@ -50,12 +66,13 @@ public class AudioReading {
 					e.printStackTrace();
 				}
 				finally {
+					System.out.println("Connection Died, Restarting Listener Processes");
 					try {
 						server.close();
 						client.close();
 					} catch (IOException e) {
 						e.printStackTrace();
-						startLocalListener(reference);
+						setUpListening();
 					}
 				}
 			}

@@ -178,6 +178,10 @@ public class Profile {
 		return out;
 	}
 
+	public String getTitle() {
+		return title;
+	}
+	
 //---  Support Methods   ----------------------------------------------------------------------
 
 	private AudioConfig getConfig(String title) {
