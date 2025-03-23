@@ -6,9 +6,12 @@ import socket
 
 
 loudest = 0
-sender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sender.connect(("127.0.0.1", 5439))
+sender = None
 
+def connect():
+	sender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sender.connect(("127.0.0.1", 5439))
+	return sender
 
 def print_sound(indata, outdata, frames, time, status):
     volume_norm = np.linalg.norm(indata)*100
@@ -16,13 +19,24 @@ def print_sound(indata, outdata, frames, time, status):
     global loudest
     if(volume_norm > loudest):
         loudest = int(volume_norm)
-try:
-	while True:
+
+sender = connect()
+
+reconnect = 0
+
+while True:
+	try:
+		print("Establishing connection")
+		print(sender)
 		with sd.Stream(callback=print_sound):
 		    sd.sleep(200)
 		    sender.send((str(loudest) + "\n").encode("utf-8"))
 		    print(str(loudest))
 		    loudest = 0
-finally:
-	print("Closed")
-	sender.close()
+	except Exception:
+		if(not sender is None):
+			sender.close()
+		print("Reconnecting")
+		sender = connect()
+
+sender.close()

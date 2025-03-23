@@ -49,11 +49,13 @@ public class AudioReading {
 		Thread thread = new Thread() {
 			@Override
 			public void run() {
+				System.out.println("Starting Local Listener Service");
 				ServerSocket server = null;
 				Socket client = null;
 				try {
 					server = new ServerSocket(START_PORT);
 					client = server.accept();
+					System.out.println(client);
 					BufferedReader receiver = new BufferedReader(new InputStreamReader(client.getInputStream()));
 					String received = receiver.readLine();
 					while(received != null && !received.equals("exit")) {
@@ -70,9 +72,9 @@ public class AudioReading {
 					try {
 						server.close();
 						client.close();
+						setUpListening();
 					} catch (IOException e) {
 						e.printStackTrace();
-						setUpListening();
 					}
 				}
 			}
