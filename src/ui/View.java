@@ -9,7 +9,7 @@ import main.ImageRetriever;
 public class View implements ImageRetriever {
 
 	private SpriteDisplay mainWindow;
-	private ConfigDisplay cfgMenu;
+	private ProfilesDisplay cfgMenu;
 	private EventProcessor eventHandler;
 	
 	public View(int wid, int hei, EventProcessor inEventHandler) {
@@ -33,7 +33,7 @@ public class View implements ImageRetriever {
 	
 	public void promptConfigMenu(String activeProf, String defaultProf, ArrayList<String> profiles) {
 		if(cfgMenu == null) {
-			cfgMenu = new ConfigDisplay(300, 500, activeProf, defaultProf, profiles, eventHandler);
+			cfgMenu = new ProfilesDisplay(300, 500, activeProf, defaultProf, profiles, eventHandler);
 		}
 	}
 	

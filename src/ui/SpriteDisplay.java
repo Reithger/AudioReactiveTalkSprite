@@ -2,6 +2,7 @@ package ui;
 
 import java.awt.Image;
 
+import main.Controller;
 import main.EventProcessor;
 import visual.composite.HandlePanel;
 import visual.frame.WindowFrame;
@@ -20,7 +21,7 @@ public class SpriteDisplay {
 			
 			@Override
 			public void clickEvent(int event, int x, int y, int clickType) { 
-				eventHandler.processEvent(0);
+				eventHandler.processEvent(Controller.CODE_DISPLAY_PROFILES);
 			}
 			
 		};

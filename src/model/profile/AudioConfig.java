@@ -3,7 +3,7 @@ package model.profile;
 import java.awt.Image;
 import java.util.ArrayList;
 
-import model.effects.Change;
+import model.change.Change;
 
 /**
  * 

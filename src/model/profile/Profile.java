@@ -4,8 +4,8 @@ import java.awt.Image;
 import java.util.ArrayList;
 
 import main.ImageRetriever;
-import model.effects.Change;
-import model.effects.ChangeFactory;
+import model.change.Change;
+import model.change.ChangeFactory;
 
 public class Profile {
 	

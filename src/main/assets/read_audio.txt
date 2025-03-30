@@ -7,11 +7,12 @@ import socket
 
 loudest = 0
 sender = None
+port = sys.argv[1]
 
 def connect():
 	global sender
 	sender = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	sender.connect(("127.0.0.1", 5439))
+	sender.connect(("127.0.0.1", int(port)))
 
 def print_sound(indata, outdata, frames, time, status):
     volume_norm = np.linalg.norm(indata)*100
@@ -23,6 +24,7 @@ def print_sound(indata, outdata, frames, time, status):
 connect()
 
 reconnect = 0
+
 
 while True:
 	try:

@@ -1,4 +1,4 @@
-package main;
+package main.audio;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -7,14 +7,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import main.Controller;
+
 /**
  * 
  * Need to adjust this so that the Port we use is dynamic and we can communicate a different port to the python program.
+ * 
+ * Need additional timer so that if the Python just stops responding without closing, resets the listener
+ * 
+ * Also just figure out how to pass arguments to the Python program so we can tell it the correct port number
  * 
  */
 
@@ -24,16 +29,21 @@ public class AudioReading {
 	
 	private final static int START_PORT = 5439;
 	
+	private final static int TIMEOUT_PERIOD = 5000;
+	
 //---  Instance Variables   -------------------------------------------------------------------
 	
 	private AudioLevelPasser passTo;
 	private double audioAdjustment;
+	
+	private int currentPort;
 	
 	public AudioReading(AudioLevelPasser reference) {
 		audioAdjustment = 1;
 		verifyPythonFileNear();
 		passTo = reference;
 		setUpListening();
+		currentPort = START_PORT;
 	}
 	
 	public void setAudioLevelAdjustment(double in) {
@@ -41,20 +51,30 @@ public class AudioReading {
 	}
 	
 	private void setUpListening() {
+		iteratePortNumber();
 		startLocalListener(passTo);
 		callAudioCheck();
 	}
 	
+	private void iteratePortNumber() {
+		currentPort++;
+		if(currentPort > 7500) {
+			currentPort = 3500;
+		}
+	}
+	
 	private void startLocalListener(AudioLevelPasser reference){
+		ListenerPacket packet = new ListenerPacket();
+		
 		Thread thread = new Thread() {
+			private volatile ListenerPacket infoRef = packet;
+			
 			@Override
 			public void run() {
 				System.out.println("Starting Local Listener Service");
-				ServerSocket server = null;
-				Socket client = null;
 				try {
-					server = new ServerSocket(START_PORT);
-					client = server.accept();
+					infoRef.restartServer(currentPort);
+					Socket client = infoRef.getClient();
 					System.out.println(client);
 					BufferedReader receiver = new BufferedReader(new InputStreamReader(client.getInputStream()));
 					String received = receiver.readLine();
@@ -62,6 +82,7 @@ public class AudioReading {
 						if(!received.equals(""))
 							reference.receiveAudio((int)(audioAdjustment * Integer.parseInt(received)));
 						received = receiver.readLine();
+						infoRef.updateLastReceived();
 					}
 				}
 				catch(Exception e) {
@@ -70,16 +91,43 @@ public class AudioReading {
 				finally {
 					System.out.println("Connection Died, Restarting Listener Processes");
 					try {
-						server.close();
-						client.close();
+						infoRef.closeServers();
 						setUpListening();
-					} catch (IOException e) {
+					} catch (Exception e) {
 						e.printStackTrace();
 					}
 				}
 			}
 		};
+		
+		Thread timeOut = new Thread() {
+			private volatile ListenerPacket infoRef = packet;
+			
+			@Override
+			public void run() {
+				while(true) {
+					try {
+						Thread.sleep(TIMEOUT_PERIOD);
+						if(System.currentTimeMillis() - infoRef.getLastReceived() > 1000 && !infoRef.getLastReceived().equals(0L)) {
+							System.out.println("Listener Thread timed out on communication with Python process, restarting");
+							thread.interrupt();
+							infoRef.closeServers();
+							setUpListening();
+							break;
+						}
+						else {
+							System.out.println("Listener Thread still in communication with Python process, last check in: " + infoRef.getLastReceived());
+						}
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		
 		thread.start();
+		timeOut.start();
 	}
 	
 	public double getCurrentAudio() {
@@ -157,19 +205,12 @@ public class AudioReading {
 		InputStream is = null;
 		Scanner sc;
 		try {
-			is = AudioReading.class.getResourceAsStream("assets/read_audio.txt");
+			is = AudioReading.class.getResourceAsStream("../assets/read_audio.txt");
 			sc = new Scanner(is);
 		}
 		catch(Exception e) {
-			try {
-				File f;
-				f = new File(Controller.CONFIG_FILE_PATH + "read_audio.txt");
-				sc = new Scanner(f);
-			}
-			catch(Exception e1) {
-				e1.printStackTrace();
-				return null;
-			}
+			e.printStackTrace();
+			return null;
 		}
 		ArrayList<String> out = new ArrayList<String>();
 		while(sc.hasNextLine()) {
@@ -181,7 +222,7 @@ public class AudioReading {
 	
 	private void callAudioCheck() {
 		try {
-			Runtime.getRuntime().exec("python " + Controller.CONFIG_FILE_PATH + "read_audio.py");
+			Runtime.getRuntime().exec("python " + Controller.CONFIG_FILE_PATH + "read_audio.py " + currentPort);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

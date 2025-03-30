@@ -10,7 +10,9 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import model.effects.ChangeFactory;
+import main.audio.AudioLevelPasser;
+import main.audio.AudioReading;
+import model.change.ChangeFactory;
 import model.profile.Profile;
 import ui.View;
 
@@ -25,6 +27,9 @@ import ui.View;
  * TODO: Some way of deciding which audio input to use (how to tell which is currently in use? Python context
  * for this, too, but need to pass that config option from Java to Python (just config.txt, reload Python))
  * 
+ * TODO: Send View width/height values into Profile so that we can have the resize occur between Filters
+ * and Effects (changing notion to that Filters are pre-resize, Effects are post-resize)
+ * 
  */
 
 public class Controller implements EventProcessor, AudioLevelPasser{
@@ -33,6 +38,7 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 	
 	public final static String CONFIG_FILE_PATH = "./ARTS/";
 	
+	public static final int CODE_DISPLAY_PROFILES = 0;
 	public static final int CODE_ACTIVE_PROFILE = 50;
 	public static final int CODE_ACTIVE_PROFILE_CONFIG = 51;
 	public static final int CODE_DEFAULT_PROFILE = 52;
@@ -52,7 +58,8 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 	private static AudioReading audio;
 	private static View view;
 	
-	/** Either this should be a list of Profiles (and thus a manager object) or we let the program
+	/** 
+	 *  Either this should be a list of Profiles (and thus a manager object) or we let the program
 	 *  read config info from files to inform the user of various Profiles and only have one loaded
 	 *  in at a time.
 	 *  
@@ -75,6 +82,7 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 		//profile = makeStarterProfile();
 		profile = ReadWriteConfig.readInProfile(ReadWriteConfig.getDefaultProfile());
 		profile.populateAudioConfigImages(view);
+		receiveAudio(0);
 	}
 	
 	private void checkNeedDefaultProfile() {
@@ -160,7 +168,7 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 	@Override
 	public void processEvent(int code) {
 		switch(code) {
-			case 0:
+			case CODE_DISPLAY_PROFILES:
 				view.promptConfigMenu(profile.getTitle(), ReadWriteConfig.getDefaultProfile(), getNonSpecialProfiles());
 				break;
 			case CODE_ACTIVE_PROFILE:
@@ -172,9 +180,7 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 			default:
 				if(code >= CODE_BASE_PROFILES && code < CODE_BASE_CONFIGS) {
 					int index = code - CODE_BASE_PROFILES;
-					System.out.println(getNonSpecialProfiles().get(index));
 					updateActiveProfile(getNonSpecialProfiles().get(index));
-					System.out.println(profile.getTitle());
 				}
 				else {
 					refreshConfigMenu();

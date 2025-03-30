@@ -1,4 +1,9 @@
-package model.effects;
+package model.change;
+
+import model.change.effect.ShakeEffect;
+import model.change.filter.DarkenFilter;
+import model.change.filter.MirrorFilter;
+import model.change.filter.RedFilter;
 
 public class ChangeFactory {
 	

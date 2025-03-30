@@ -1,4 +1,6 @@
-package model.effects;
+package model.change.effect;
+
+import model.change.Change;
 
 /**
  * 

@@ -21,7 +21,7 @@ import visual.composite.popout.PopoutWindow;
  * 
  */
 
-public class ConfigDisplay extends PopoutWindow{
+public class ProfilesDisplay extends PopoutWindow{
 	
 //---  Constants   ----------------------------------------------------------------------------
 	
@@ -48,7 +48,7 @@ public class ConfigDisplay extends PopoutWindow{
 
 //---  Constructors   -------------------------------------------------------------------------
 	
-	public ConfigDisplay(int width, int height, String activeProfile, String defaultProfile, ArrayList<String> profiles, EventProcessor eventProcessor) {
+	public ProfilesDisplay(int width, int height, String activeProfile, String defaultProfile, ArrayList<String> profiles, EventProcessor eventProcessor) {
 		super(width, height);
 		wid = width;
 		eventHandler = eventProcessor;

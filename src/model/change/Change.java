@@ -1,4 +1,4 @@
-package model.effects;
+package model.change;
 
 import java.awt.Image;
 

@@ -1,9 +1,11 @@
-package model.effects;
+package model.change.filter;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+
+import model.change.ChangeFactory;
 
 public class MirrorFilter implements Filter {
 	
