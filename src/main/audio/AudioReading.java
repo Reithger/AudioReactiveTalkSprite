@@ -129,27 +129,7 @@ public class AudioReading {
 		thread.start();
 		timeOut.start();
 	}
-	
-	public double getCurrentAudio() {
-		File f = new File("pngassets/audio_level.txt");
-		try {
-			f.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		Scanner sc = null;
-		try {
-			sc = new Scanner(f);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		if(sc.hasNextLine()) {
-			String line = sc.nextLine();
-			return Double.parseDouble(line);
-		}
-		return 0;
-	}
-	
+
 	private void verifyPythonFileNear() {
 		File f = new File(Controller.CONFIG_FILE_PATH + "/read_audio.py");
 		if(!f.exists() || !validateFileCorrect(f)) {
@@ -195,7 +175,7 @@ public class AudioReading {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			System.out.println("read_audio.py file not validated, rewrite; error occured");
+			System.out.println("read_audio.py file not validated, no rewrite performed; error occured");
 			return false;
 		}
 		
@@ -209,8 +189,8 @@ public class AudioReading {
 			sc = new Scanner(is);
 		}
 		catch(Exception e) {
-			e.printStackTrace();
-			return null;
+			is = AudioReading.class.getResourceAsStream("/main/assets/read_audio.txt");
+			sc = new Scanner(is);
 		}
 		ArrayList<String> out = new ArrayList<String>();
 		while(sc.hasNextLine()) {
