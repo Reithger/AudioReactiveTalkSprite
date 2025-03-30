@@ -8,3 +8,7 @@
 and while it could be customized in its config files directly, that isn't a user-friendly option at the moment.
 
 Will also add more visual filters/effects over time, current you can have it darken, redden, mirror, and shake depending on your current 'loudness' through your mic.
+
+## Project UML Class Diagram as of March 30'th version
+
+![ARTS UML - March 30, 2025](https://github.com/user-attachments/assets/9e25e2ce-e1df-4542-bd9e-f830cec8f0ed)
