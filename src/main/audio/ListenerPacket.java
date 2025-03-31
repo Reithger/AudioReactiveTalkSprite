@@ -4,10 +4,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ListenerPacket {
+	
+//---  Instance Variables   -------------------------------------------------------------------
 
 	private ServerSocket server;
 	private Socket client;
 	private Long lastReceived;
+	private Thread listener;
+	private Thread timeOut;
+	
+//---  Constructors   -------------------------------------------------------------------------
 	
 	public ListenerPacket() {
 		lastReceived = 0L;
@@ -24,17 +30,7 @@ public class ListenerPacket {
 		}
 	}
 	
-	public ServerSocket getServer() {
-		return server;
-	}
-	
-	public Socket getClient() {
-		return client;
-	}
-	
-	public Long getLastReceived() {
-		return lastReceived;
-	}
+//---  Operations   ---------------------------------------------------------------------------
 	
 	public void updateLastReceived() {
 		lastReceived = System.currentTimeMillis();
@@ -66,4 +62,35 @@ public class ListenerPacket {
 		}
 	}
 	
+	public void assignThreads(Thread listen, Thread time) {
+		listener = listen;
+		timeOut = time;
+	}
+	
+	public void killListenerThread() {
+		if(listener != null) {
+			listener.interrupt();
+		}
+	}
+	
+	public void killTimerThread() {
+		if(timeOut != null) {
+			timeOut.interrupt();
+		}
+	}
+	
+//---  Getter Methods   -----------------------------------------------------------------------0
+	
+	public ServerSocket getServer() {
+		return server;
+	}
+	
+	public Socket getClient() {
+		return client;
+	}
+	
+	public Long getLastReceived() {
+		return lastReceived;
+	}
+
 }

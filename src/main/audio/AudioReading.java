@@ -90,12 +90,9 @@ public class AudioReading {
 				}
 				finally {
 					System.out.println("Connection Died, Restarting Listener Processes");
-					try {
-						infoRef.closeServers();
-						setUpListening();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+					infoRef.closeServers();
+					infoRef.killTimerThread();
+					setUpListening();
 				}
 			}
 		};
@@ -108,10 +105,10 @@ public class AudioReading {
 				while(true) {
 					try {
 						Thread.sleep(TIMEOUT_PERIOD);
-						if(System.currentTimeMillis() - infoRef.getLastReceived() > 1000 && !infoRef.getLastReceived().equals(0L)) {
+						if(System.currentTimeMillis() - infoRef.getLastReceived() > TIMEOUT_PERIOD && !infoRef.getLastReceived().equals(0L)) {
 							System.out.println("Listener Thread timed out on communication with Python process, restarting");
-							thread.interrupt();
 							infoRef.closeServers();
+							infoRef.killListenerThread();
 							setUpListening();
 							break;
 						}
@@ -119,12 +116,16 @@ public class AudioReading {
 							System.out.println("Listener Thread still in communication with Python process, last check in: " + infoRef.getLastReceived());
 						}
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						infoRef.closeServers();
+						infoRef.killListenerThread();
+						setUpListening();
 					}
 				}
 			}
 		};
+		
+		packet.assignThreads(thread, timeOut);
 		
 		thread.start();
 		timeOut.start();
