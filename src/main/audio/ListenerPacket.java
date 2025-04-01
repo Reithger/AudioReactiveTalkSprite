@@ -10,8 +10,8 @@ public class ListenerPacket {
 	private ServerSocket server;
 	private Socket client;
 	private Long lastReceived;
-	private Thread listener;
-	private Thread timeOut;
+	private ListeningThread listener;
+	private TimeOutThread timeOut;
 	
 //---  Constructors   -------------------------------------------------------------------------
 	
@@ -50,35 +50,39 @@ public class ListenerPacket {
 		}
 	}
 	
-	public void closeServers() {
+	public void closeOutSession() {
 		try {
-			if(server != null) {
+			if(server != null && !server.isClosed()) {
 				server.close();
+			}
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+		try {
+			if(client != null && !client.isClosed()) {
 				client.close();
 			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();
 		}
+		if(listener != null) {
+			listener.end();
+			listener.interrupt();
+		}
+		if(timeOut != null) {
+			timeOut.end();
+			timeOut.interrupt();
+		}
+		
 	}
-	
-	public void assignThreads(Thread listen, Thread time) {
+
+	public void assignThreads(ListeningThread listen, TimeOutThread time) {
 		listener = listen;
 		timeOut = time;
 	}
-	
-	public void killListenerThread() {
-		if(listener != null) {
-			listener.interrupt();
-		}
-	}
-	
-	public void killTimerThread() {
-		if(timeOut != null) {
-			timeOut.interrupt();
-		}
-	}
-	
+
 //---  Getter Methods   -----------------------------------------------------------------------0
 	
 	public ServerSocket getServer() {

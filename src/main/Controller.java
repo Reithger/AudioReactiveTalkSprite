@@ -192,7 +192,7 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 	@Override
 	public void receiveAudio(int newAudio) {
 		if(profile != null) {
-		Image img = profile.getAppropriateAudioImage(newAudio);
+		Image img = profile.getAppropriateAudioImage((int)(newAudio * audio.getAudioAdjustment()));
 			if(img != null)
 				view.updateSpriteDisplay(img);
 		}

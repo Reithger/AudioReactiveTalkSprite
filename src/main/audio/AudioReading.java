@@ -1,13 +1,10 @@
 package main.audio;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -23,7 +20,7 @@ import main.Controller;
  * 
  */
 
-public class AudioReading {
+public class AudioReading implements InitiateListening{
 	
 //---  Constants   ----------------------------------------------------------------------------
 	
@@ -35,8 +32,10 @@ public class AudioReading {
 	
 	private AudioLevelPasser passTo;
 	private double audioAdjustment;
-	
 	private int currentPort;
+	private volatile ListenerPacket packet;
+	
+//---  Constructors   -------------------------------------------------------------------------
 	
 	public AudioReading(AudioLevelPasser reference) {
 		audioAdjustment = 1;
@@ -46,16 +45,17 @@ public class AudioReading {
 		currentPort = START_PORT;
 	}
 	
-	public void setAudioLevelAdjustment(double in) {
-		audioAdjustment = in;
-	}
+//---  Operations   ---------------------------------------------------------------------------
 	
-	private void setUpListening() {
+	public void setUpListening() {
 		iteratePortNumber();
+		if(packet != null) {
+			packet.closeOutSession();
+		}
 		startLocalListener(passTo);
 		callAudioCheck();
 	}
-	
+
 	private void iteratePortNumber() {
 		currentPort++;
 		if(currentPort > 7500) {
@@ -64,73 +64,41 @@ public class AudioReading {
 	}
 	
 	private void startLocalListener(AudioLevelPasser reference){
-		ListenerPacket packet = new ListenerPacket();
+		packet = new ListenerPacket();
 		
-		Thread thread = new Thread() {
-			private volatile ListenerPacket infoRef = packet;
-			
-			@Override
-			public void run() {
-				System.out.println("Starting Local Listener Service");
-				try {
-					infoRef.restartServer(currentPort);
-					Socket client = infoRef.getClient();
-					System.out.println(client);
-					BufferedReader receiver = new BufferedReader(new InputStreamReader(client.getInputStream()));
-					String received = receiver.readLine();
-					while(received != null && !received.equals("exit")) {
-						if(!received.equals(""))
-							reference.receiveAudio((int)(audioAdjustment * Integer.parseInt(received)));
-						received = receiver.readLine();
-						infoRef.updateLastReceived();
-					}
-				}
-				catch(Exception e) {
-					e.printStackTrace();
-				}
-				finally {
-					System.out.println("Connection Died, Restarting Listener Processes");
-					infoRef.closeServers();
-					infoRef.killTimerThread();
-					setUpListening();
-				}
-			}
-		};
+		ListeningThread listen = new ListeningThread(packet, reference, currentPort);
 		
-		Thread timeOut = new Thread() {
-			private volatile ListenerPacket infoRef = packet;
-			
-			@Override
-			public void run() {
-				while(true) {
-					try {
-						Thread.sleep(TIMEOUT_PERIOD);
-						if(System.currentTimeMillis() - infoRef.getLastReceived() > TIMEOUT_PERIOD && !infoRef.getLastReceived().equals(0L)) {
-							System.out.println("Listener Thread timed out on communication with Python process, restarting");
-							infoRef.closeServers();
-							infoRef.killListenerThread();
-							setUpListening();
-							break;
-						}
-						else {
-							System.out.println("Listener Thread still in communication with Python process, last check in: " + infoRef.getLastReceived());
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-						infoRef.closeServers();
-						infoRef.killListenerThread();
-						setUpListening();
-					}
-				}
-			}
-		};
+		TimeOutThread timeOut = new TimeOutThread(packet, this, 1000, TIMEOUT_PERIOD);
 		
-		packet.assignThreads(thread, timeOut);
+		packet.assignThreads(listen, timeOut);
 		
-		thread.start();
+		listen.start();
 		timeOut.start();
 	}
+	
+	private void callAudioCheck() {
+		try {
+			Runtime.getRuntime().exec("python " + Controller.CONFIG_FILE_PATH + "read_audio.py " + currentPort);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
+//---  Setter Methods   -----------------------------------------------------------------------
+
+	public void setAudioLevelAdjustment(double in) {
+		audioAdjustment = in;
+	}
+	
+//---  Getter Methods   -----------------------------------------------------------------------
+	
+	public double getAudioAdjustment() {
+		return audioAdjustment;
+	}
+
+//---  Support Methods   ----------------------------------------------------------------------
+	
 	private void verifyPythonFileNear() {
 		File f = new File(Controller.CONFIG_FILE_PATH + "/read_audio.py");
 		if(!f.exists() || !validateFileCorrect(f)) {
@@ -199,15 +167,6 @@ public class AudioReading {
 		}
 		sc.close();
 		return out;
-	}
-	
-	private void callAudioCheck() {
-		try {
-			Runtime.getRuntime().exec("python " + Controller.CONFIG_FILE_PATH + "read_audio.py " + currentPort);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 }
