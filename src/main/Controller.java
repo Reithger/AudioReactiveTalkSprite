@@ -12,8 +12,8 @@ import javax.imageio.ImageIO;
 
 import main.audio.AudioLevelPasser;
 import main.audio.AudioReading;
-import model.change.ChangeFactory;
 import model.profile.Profile;
+import ui.EventSender;
 import ui.View;
 
 /**
@@ -32,19 +32,11 @@ import ui.View;
  * 
  */
 
-public class Controller implements EventProcessor, AudioLevelPasser{
+public class Controller implements EventProcessor, AudioLevelPasser {
 	
 //---  Constants   ----------------------------------------------------------------------------
 	
 	public final static String CONFIG_FILE_PATH = "./ARTS/";
-	
-	public static final int CODE_DISPLAY_PROFILES = 0;
-	public static final int CODE_ACTIVE_PROFILE = 50;
-	public static final int CODE_ACTIVE_PROFILE_CONFIG = 51;
-	public static final int CODE_DEFAULT_PROFILE = 52;
-	public static final int CODE_DEFAULT_PROFILE_CONFIG = 53;
-	public static final int CODE_BASE_PROFILES = 100;
-	public static final int CODE_BASE_CONFIGS = 200;
 	
 //---  Instance Variables   -------------------------------------------------------------------
 	
@@ -74,7 +66,8 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 	public Controller() {
 		File f = new File(CONFIG_FILE_PATH);
 		f.mkdirs();
-		view = new View(DEFAULT_WIDTH, DEFAULT_HEIGHT, this);
+		EventSender.assignEventProcessor(this);
+		view = new View(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		checkNeedDefaultProfile();
 		ReadWriteConfig.populateConfigDefaultValues();
 		audio = new AudioReading(this);
@@ -116,13 +109,13 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 		profile = new Profile("Default");
 		try {
 			profile.addAudioConfig("Quiet", 0, SKULL_PATH, 0);
-			profile.addAudioConfigChange("Quiet", ChangeFactory.KEYWORD_DARKEN_FILTER, ".6");
-			profile.addAudioConfigChange("Quiet", ChangeFactory.KEYWORD_MIRROR_FILTER);
+			profile.addAudioConfigChange("Quiet", "darken", ".6");
+			profile.addAudioConfigChange("Quiet", "mirror");
 			profile.addAudioConfig("Speaking", 20, SKULL_PATH, 7);
-			profile.addAudioConfigChange("Speaking", ChangeFactory.KEYWORD_SHAKE_EFFECT, "1", "1");
-			profile.addAudioConfigChange("Speaking", ChangeFactory.KEYWORD_MIRROR_FILTER);
+			profile.addAudioConfigChange("Speaking", "shake", "1", "1");
+			profile.addAudioConfigChange("Speaking", "mirror");
 			profile.addAudioConfig("Loud", 300, SKULL_PATH, 12);
-			profile.addAudioConfigChange("Loud", ChangeFactory.KEYWORD_RED_FILTER);
+			profile.addAudioConfigChange("Loud", "red");
 			profile.populateAudioConfigImages(view);
 			return profile;
 		}
@@ -168,18 +161,18 @@ public class Controller implements EventProcessor, AudioLevelPasser{
 	@Override
 	public void processEvent(int code) {
 		switch(code) {
-			case CODE_DISPLAY_PROFILES:
+			case CodeReference.CODE_DISPLAY_PROFILES:
 				view.promptConfigMenu(profile.getTitle(), ReadWriteConfig.getDefaultProfile(), getNonSpecialProfiles());
 				break;
-			case CODE_ACTIVE_PROFILE:
+			case CodeReference.CODE_ACTIVE_PROFILE:
 				refreshConfigMenu();
 				break;
-			case CODE_DEFAULT_PROFILE:
+			case CodeReference.CODE_DEFAULT_PROFILE:
 				refreshConfigMenu();
 				break;
 			default:
-				if(code >= CODE_BASE_PROFILES && code < CODE_BASE_CONFIGS) {
-					int index = code - CODE_BASE_PROFILES;
+				if(code >= CodeReference.CODE_BASE_PROFILES && code < CodeReference.CODE_BASE_CONFIGS) {
+					int index = code - CodeReference.CODE_BASE_PROFILES;
 					updateActiveProfile(getNonSpecialProfiles().get(index));
 				}
 				else {

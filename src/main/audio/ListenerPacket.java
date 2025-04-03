@@ -10,8 +10,8 @@ public class ListenerPacket {
 	private ServerSocket server;
 	private Socket client;
 	private Long lastReceived;
-	private ListeningThread listener;
-	private TimeOutThread timeOut;
+	private KeepAliveThread listener;
+	private KeepAliveThread timeOut;
 	
 //---  Constructors   -------------------------------------------------------------------------
 	
@@ -78,7 +78,7 @@ public class ListenerPacket {
 		
 	}
 
-	public void assignThreads(ListeningThread listen, TimeOutThread time) {
+	public void assignThreads(KeepAliveThread listen, KeepAliveThread time) {
 		listener = listen;
 		timeOut = time;
 	}

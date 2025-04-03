@@ -1,12 +1,10 @@
-package ui;
+package ui.display;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 
-import main.Controller;
-import main.EventProcessor;
-import visual.composite.popout.PopoutWindow;
+import main.CodeReference;
 
 /**
  * 
@@ -21,7 +19,7 @@ import visual.composite.popout.PopoutWindow;
  * 
  */
 
-public class ProfilesDisplay extends PopoutWindow{
+public class ProfilesDisplay extends VisualDisplay{
 	
 //---  Constants   ----------------------------------------------------------------------------
 	
@@ -44,14 +42,11 @@ public class ProfilesDisplay extends PopoutWindow{
 	private int wid;
 	private int hei;
 	
-	private EventProcessor eventHandler;
-
 //---  Constructors   -------------------------------------------------------------------------
 	
-	public ProfilesDisplay(int width, int height, String activeProfile, String defaultProfile, ArrayList<String> profiles, EventProcessor eventProcessor) {
+	public ProfilesDisplay(int width, int height, String activeProfile, String defaultProfile, ArrayList<String> profiles) {
 		super(width, height);
 		wid = width;
-		eventHandler = eventProcessor;
 		hei = height;
 		drawPage(activeProfile, defaultProfile, profiles);
 	}
@@ -67,16 +62,16 @@ public class ProfilesDisplay extends PopoutWindow{
 		this.handleScrollbar("scrollbar", "bar", MOVE_GROUP, 35, wid - getScrollWid(), 0, getScrollWid(), hei, 0, hei, true);
 		int startX = wid / 2 - (getScrollWid() / 2);
 		int startY = hei / (NUM_PROFILES_ONCE * 3 / 2);
-		int useProfileCode = Controller.CODE_BASE_PROFILES;
-		int useConfigCode = Controller.CODE_BASE_CONFIGS;
+		int useProfileCode = CodeReference.CODE_BASE_PROFILES;
+		int useConfigCode = CodeReference.CODE_BASE_CONFIGS;
 		int changeY = hei / NUM_PROFILES_ONCE;
 		
 		if(activeProfile != null) {
-			drawProfileButton(activeProfile, startX, startY, Controller.CODE_ACTIVE_PROFILE, Controller.CODE_ACTIVE_PROFILE_CONFIG, activeProfile.equals(defaultProfile) ? MOD_ACTIVE_DEFAULT : MOD_ACTIVE);
+			drawProfileButton(activeProfile, startX, startY, CodeReference.CODE_ACTIVE_PROFILE, CodeReference.CODE_ACTIVE_PROFILE_CONFIG, activeProfile.equals(defaultProfile) ? MOD_ACTIVE_DEFAULT : MOD_ACTIVE);
 			startY += changeY;
 		}
 		if(defaultProfile != null && !activeProfile.equals(defaultProfile)) {
-			drawProfileButton(defaultProfile, startX, startY, Controller.CODE_DEFAULT_PROFILE, Controller.CODE_DEFAULT_PROFILE_CONFIG, MOD_DEFAULT);
+			drawProfileButton(defaultProfile, startX, startY, CodeReference.CODE_DEFAULT_PROFILE, CodeReference.CODE_DEFAULT_PROFILE_CONFIG, MOD_DEFAULT);
 			startY += changeY;
 		}
 		for(String s : profiles) {
@@ -126,11 +121,6 @@ public class ProfilesDisplay extends PopoutWindow{
 	
 	private int getScrollWid() {
 		return wid / SCROLLBAR_WIDTH_RATIO;
-	}
-	
-	@Override
-	public void clickAction(int clickEvent, int x, int y) {
-		eventHandler.processEvent(clickEvent);
 	}
 
 }

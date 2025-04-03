@@ -3,18 +3,18 @@ package ui;
 import java.awt.Image;
 import java.util.ArrayList;
 
-import main.EventProcessor;
 import main.ImageRetriever;
+import ui.display.AudioConfigsDisplay;
+import ui.display.ProfilesDisplay;
+import ui.display.SpriteDisplay;
 
 public class View implements ImageRetriever {
 
 	private SpriteDisplay mainWindow;
 	private ProfilesDisplay cfgMenu;
-	private EventProcessor eventHandler;
 	
-	public View(int wid, int hei, EventProcessor inEventHandler) {
-		eventHandler = inEventHandler;
-		mainWindow = new SpriteDisplay(wid, hei, eventHandler);
+	public View(int wid, int hei) {
+		mainWindow = new SpriteDisplay(wid, hei);
 	}
 	
 	public void updateSpriteDisplay(Image img) {
@@ -33,7 +33,7 @@ public class View implements ImageRetriever {
 	
 	public void promptConfigMenu(String activeProf, String defaultProf, ArrayList<String> profiles) {
 		if(cfgMenu == null) {
-			cfgMenu = new ProfilesDisplay(300, 500, activeProf, defaultProf, profiles, eventHandler);
+			cfgMenu = new ProfilesDisplay(300, 500, activeProf, defaultProf, profiles);
 		}
 	}
 	
@@ -41,6 +41,10 @@ public class View implements ImageRetriever {
 		if(cfgMenu != null) {
 			cfgMenu.refresh(activeProf, defaultProf, profiles);
 		}
+	}
+	
+	public void promptAudioConfigsMenu() {
+		AudioConfigsDisplay acd = new AudioConfigsDisplay(250, 250, "reference");
 	}
 	
 	@Override

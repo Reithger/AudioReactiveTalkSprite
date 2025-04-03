@@ -1,25 +1,23 @@
 package main.audio;
 
-public class TimeOutThread extends Thread{
+public class TimeOutThread extends KeepAliveThread{
 
 	private volatile ListenerPacket packet;
 	private InitiateListening reference;
 	private int checkRate;
 	private int timeoutPeriod;
 	
-	private volatile boolean keepAlive;
-	
 	public TimeOutThread(ListenerPacket context, InitiateListening refIn, int checkTimer, int timeout) {
+		super();
 		packet = context;
 		reference = refIn;
 		checkRate = checkTimer;
 		timeoutPeriod = timeout;
-		keepAlive = true;
 	}
 	
 	@Override
 	public void run() {
-		while(keepAlive) {
+		while(getKeepAliveStatus()) {
 			try {
 				Thread.sleep(checkRate);
 				if(System.currentTimeMillis() - packet.getLastReceived() > timeoutPeriod && !packet.getLastReceived().equals(0L)) {
@@ -36,8 +34,11 @@ public class TimeOutThread extends Thread{
 		}
 	}
 	
+	@Override
 	public void end() {
-		keepAlive = false;
+		super.end();
+		packet = null;
+		reference = null;
 	}
 	
 }

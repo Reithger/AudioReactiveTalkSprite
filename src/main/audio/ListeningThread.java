@@ -4,19 +4,17 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class ListeningThread extends Thread{
+public class ListeningThread extends KeepAliveThread{
 
 	private volatile ListenerPacket packet;
 	private AudioLevelPasser reference;
 	private int currentPort;
 	
-	private volatile boolean keepAlive;
-	
 	public ListeningThread(ListenerPacket context, AudioLevelPasser refSend, int currPort) {
+		super();
 		packet = context;
 		reference = refSend;
 		currentPort = currPort;
-		keepAlive = true;
 	}
 	
 	@Override
@@ -28,7 +26,7 @@ public class ListeningThread extends Thread{
 			System.out.println(client);
 			BufferedReader receiver = new BufferedReader(new InputStreamReader(client.getInputStream()));
 			String received = receiver.readLine();
-			while(received != null && !received.equals("exit") && keepAlive) {
+			while(received != null && !received.equals("exit") && getKeepAliveStatus()) {
 				if(!received.equals(""))
 					reference.receiveAudio((int)(Integer.parseInt(received)));
 				received = receiver.readLine();
@@ -43,8 +41,11 @@ public class ListeningThread extends Thread{
 		}
 	}
 	
+	@Override
 	public void end() {
-		keepAlive = false;
+		super.end();
+		packet = null;
+		reference = null;
 	}
 	
 }
