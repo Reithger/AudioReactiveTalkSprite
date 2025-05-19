@@ -53,7 +53,7 @@ public class ShakeEffect implements Effect{
 			lastOffY = rand.nextInt(shakeRange) - shakeRange / 2;
 		}
 		counter++;
-		gr2.drawImage(startImage, lastOffX, lastOffY, new Color(255, 255, 255, 0), null);
+		gr2.drawImage(startImage, lastOffX, lastOffY, new Color(255, 255, 255, 255), null);
 		gr2.dispose();
 		
 		return copy;

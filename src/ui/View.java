@@ -32,9 +32,10 @@ public class View implements ImageRetriever {
 	 */
 	
 	public void promptConfigMenu(String activeProf, String defaultProf, ArrayList<String> profiles) {
-		if(cfgMenu == null) {
-			cfgMenu = new ProfilesDisplay(300, 500, activeProf, defaultProf, profiles);
+		if(cfgMenu != null) {
+			cfgMenu.dispose();
 		}
+		cfgMenu = new ProfilesDisplay(300, 500, activeProf, defaultProf, profiles);
 	}
 	
 	public void refreshConfigMenu(String activeProf, String defaultProf, ArrayList<String> profiles) {

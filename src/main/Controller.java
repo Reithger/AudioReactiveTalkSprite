@@ -160,6 +160,7 @@ public class Controller implements EventProcessor, AudioLevelPasser {
 	
 	@Override
 	public void processEvent(int code) {
+		System.out.println(code);
 		switch(code) {
 			case CodeReference.CODE_DISPLAY_PROFILES:
 				view.promptConfigMenu(profile.getTitle(), ReadWriteConfig.getDefaultProfile(), getNonSpecialProfiles());

@@ -16,6 +16,8 @@ import main.CodeReference;
  * 
  * TODO: Can set a Profile as the default; if no default set, just uses the last one you used
  * 
+ * TODO: Need a way to add/delete profiles, too
+ * 
  * 
  */
 
