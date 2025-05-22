@@ -10,8 +10,7 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import main.audio.AudioLevelPasser;
-import main.audio.AudioReading;
+import main.audio.PythonListenerValidation;
 import model.profile.Profile;
 import ui.EventSender;
 import ui.View;
@@ -32,7 +31,7 @@ import ui.View;
  * 
  */
 
-public class Controller implements EventProcessor, AudioLevelPasser {
+public class Controller implements EventProcessor, JavaReceiver {
 	
 //---  Constants   ----------------------------------------------------------------------------
 	
@@ -49,6 +48,8 @@ public class Controller implements EventProcessor, AudioLevelPasser {
 
 	private static AudioReading audio;
 	private static View view;
+	
+	private double audioAdjustment;
 	
 	/** 
 	 *  Either this should be a list of Profiles (and thus a manager object) or we let the program
@@ -67,15 +68,18 @@ public class Controller implements EventProcessor, AudioLevelPasser {
 		File f = new File(CONFIG_FILE_PATH);
 		f.mkdirs();
 		EventSender.assignEventProcessor(this);
+		audioAdjustment = 1.0;
 		view = new View(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 		checkNeedDefaultProfile();
 		ReadWriteConfig.populateConfigDefaultValues();
-		audio = new AudioReading(this);
+		
+		PythonListenerValidation.verifyPythonFileNear();
+		audio = new AudioReading(CONFIG_FILE_PATH + "read_audio.py", this);
 		
 		//profile = makeStarterProfile();
 		profile = ReadWriteConfig.readInProfile(ReadWriteConfig.getDefaultProfile());
 		profile.populateAudioConfigImages(view);
-		receiveAudio(0);
+		receivePythonData("0");
 	}
 	
 	private void checkNeedDefaultProfile() {
@@ -140,9 +144,14 @@ public class Controller implements EventProcessor, AudioLevelPasser {
 		refreshConfigMenu();
 	}
 	
-	public void setAudioLevelAdjustor(double in) {
-		if(audio != null && in >= 0.0)
-			audio.setAudioLevelAdjustment(in);
+	public void setAudioLevedjustor(double in) {
+		if(in >= 0.0) {
+			audioAdjustment = in;
+		}
+	}
+	
+	public double getAudioAdjustment() {
+		return audioAdjustment;
 	}
 	
 	private ArrayList<String> getNonSpecialProfiles(){
@@ -184,9 +193,10 @@ public class Controller implements EventProcessor, AudioLevelPasser {
 	}
 
 	@Override
-	public void receiveAudio(int newAudio) {
+	public void receivePythonData(String newAudio) {
+		int use = Integer.parseInt(newAudio);
 		if(profile != null) {
-		Image img = profile.getAppropriateAudioImage((int)(newAudio * audio.getAudioAdjustment()));
+		Image img = profile.getAppropriateAudioImage((int)(use * getAudioAdjustment()));
 			if(img != null)
 				view.updateSpriteDisplay(img);
 		}
