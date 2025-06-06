@@ -1,4 +1,4 @@
-package main;
+package control;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -10,7 +10,8 @@ import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 
-import main.audio.PythonListenerValidation;
+import core.JavaReceiver;
+import core.SocketControl;
 import model.profile.Profile;
 import ui.EventSender;
 import ui.View;
@@ -42,11 +43,14 @@ public class Controller implements EventProcessor, JavaReceiver {
 	private static int DEFAULT_WIDTH = 250;
 	private static int DEFAULT_HEIGHT = 250;
 	
-	private static String INTERNAL_SKULL_PATH = "./main/assets/skull.png";
+	private static String INTERNAL_SKULL_PATH = "./control/assets/skull.png";
 	private static String DEFAULT_PROFILE_PATH = CONFIG_FILE_PATH + "Default/";
 	private static String SKULL_PATH = CONFIG_FILE_PATH + "Default/skull.png";
+	private static String PYTHON_FILE_NAME = "read_audio.py";
+	private static String JAR_REFERENCE_PATH = "/control/assets/read_audio.txt";
+	private static String LOCAL_REFERENCE_PATH = "../assets/read_audio.txt";
 
-	private static AudioReading audio;
+	private static SocketControl socket;
 	private static View view;
 	
 	private double audioAdjustment;
@@ -73,13 +77,23 @@ public class Controller implements EventProcessor, JavaReceiver {
 		checkNeedDefaultProfile();
 		ReadWriteConfig.populateConfigDefaultValues();
 		
-		PythonListenerValidation.verifyPythonFileNear();
-		audio = new AudioReading(CONFIG_FILE_PATH + "read_audio.py", this);
+		socket = new SocketControl();
+		
+		socket.verifySubprogramReady(CONFIG_FILE_PATH, PYTHON_FILE_NAME, LOCAL_REFERENCE_PATH, JAR_REFERENCE_PATH);
+		
+		socket.createSocketInstance("read_audio");
+		socket.setInstancePort("read_audio", 2500);
+		
+		socket.setInstanceSubprogramPython("read_audio", CONFIG_FILE_PATH + PYTHON_FILE_NAME);
+		
+		socket.attachJavaReceiver("read_audio", this);
+		
+		socket.runSocketInstance("read_audio");
 		
 		//profile = makeStarterProfile();
 		profile = ReadWriteConfig.readInProfile(ReadWriteConfig.getDefaultProfile());
 		profile.populateAudioConfigImages(view);
-		receivePythonData("0");
+		receiveSocketData("0");
 	}
 	
 	private void checkNeedDefaultProfile() {
@@ -193,7 +207,7 @@ public class Controller implements EventProcessor, JavaReceiver {
 	}
 
 	@Override
-	public void receivePythonData(String newAudio) {
+	public void receiveSocketData(String newAudio) {
 		int use = Integer.parseInt(newAudio);
 		if(profile != null) {
 		Image img = profile.getAppropriateAudioImage((int)(use * getAudioAdjustment()));

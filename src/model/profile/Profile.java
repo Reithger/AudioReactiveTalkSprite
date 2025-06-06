@@ -3,7 +3,7 @@ package model.profile;
 import java.awt.Image;
 import java.util.ArrayList;
 
-import main.ImageRetriever;
+import control.ImageRetriever;
 import model.change.Change;
 import model.change.ChangeFactory;
 

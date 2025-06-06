@@ -1,6 +1,6 @@
 package ui;
 
-import main.EventProcessor;
+import control.EventProcessor;
 
 public class EventSender {
 

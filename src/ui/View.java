@@ -3,7 +3,7 @@ package ui;
 import java.awt.Image;
 import java.util.ArrayList;
 
-import main.ImageRetriever;
+import control.ImageRetriever;
 import ui.display.AudioConfigsDisplay;
 import ui.display.ProfilesDisplay;
 import ui.display.SpriteDisplay;

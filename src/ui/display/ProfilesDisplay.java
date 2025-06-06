@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.ArrayList;
 
-import main.CodeReference;
+import control.CodeReference;
 
 /**
  * 

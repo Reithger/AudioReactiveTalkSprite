@@ -2,7 +2,7 @@ package ui.display;
 
 import java.awt.Image;
 
-import main.CodeReference;
+import control.CodeReference;
 
 /**
  * 
