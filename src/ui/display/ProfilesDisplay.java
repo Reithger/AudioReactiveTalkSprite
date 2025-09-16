@@ -27,7 +27,7 @@ public class ProfilesDisplay extends VisualDisplay{
 	
 	private static final String MOVE_GROUP = "slide";
 	
-	private static final String CONFIG_IMAGE_PATH = "/main/assets/skull.png";
+	private static final String CONFIG_IMAGE_PATH = "/control/assets/skull.png";
 	
 	private static final int NUM_PROFILES_ONCE = 6;
 	private static final int SCROLLBAR_WIDTH_RATIO = 18;

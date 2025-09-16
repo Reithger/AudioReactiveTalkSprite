@@ -40,8 +40,8 @@ public class Controller implements EventProcessor, JavaReceiver {
 	
 //---  Instance Variables   -------------------------------------------------------------------
 	
-	private static int DEFAULT_WIDTH = 250;
-	private static int DEFAULT_HEIGHT = 250;
+	private static int DEFAULT_WIDTH = 300;
+	private static int DEFAULT_HEIGHT = 300;
 	
 	private static String INTERNAL_SKULL_PATH = "./control/assets/skull.png";
 	private static String DEFAULT_PROFILE_PATH = CONFIG_FILE_PATH + "Default/";
@@ -82,18 +82,25 @@ public class Controller implements EventProcessor, JavaReceiver {
 		socket.verifySubprogramReady(CONFIG_FILE_PATH, PYTHON_FILE_NAME, LOCAL_REFERENCE_PATH, JAR_REFERENCE_PATH);
 		
 		socket.createSocketInstance("read_audio");
-		socket.setInstancePort("read_audio", 2500);
+		socket.setInstanceListenPortRandom("read_audio");
 		
 		socket.setInstanceSubprogramPython("read_audio", CONFIG_FILE_PATH + PYTHON_FILE_NAME);
 		
 		socket.attachJavaReceiver("read_audio", this);
 		
-		socket.runSocketInstance("read_audio");
+		socket.setInstanceQuiet("read_audio", true);
+		
+		try {
+			socket.runSocketInstance("read_audio");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 		//profile = makeStarterProfile();
 		profile = ReadWriteConfig.readInProfile(ReadWriteConfig.getDefaultProfile());
 		profile.populateAudioConfigImages(view);
-		receiveSocketData("0");
+		receiveSocketData("0", null);
 	}
 	
 	private void checkNeedDefaultProfile() {
@@ -207,7 +214,7 @@ public class Controller implements EventProcessor, JavaReceiver {
 	}
 
 	@Override
-	public void receiveSocketData(String newAudio) {
+	public void receiveSocketData(String newAudio, ArrayList<String> tag) {
 		int use = Integer.parseInt(newAudio);
 		if(profile != null) {
 		Image img = profile.getAppropriateAudioImage((int)(use * getAudioAdjustment()));

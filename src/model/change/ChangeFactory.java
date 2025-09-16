@@ -1,6 +1,9 @@
 package model.change;
 
+import model.change.effect.GreenscreenEffect;
+import model.change.effect.PadEffect;
 import model.change.effect.ShakeEffect;
+import model.change.effect.SideShakeEffect;
 import model.change.filter.DarkenFilter;
 import model.change.filter.MirrorFilter;
 import model.change.filter.RedFilter;
@@ -13,7 +16,13 @@ public class ChangeFactory {
 	
 	public static final String KEYWORD_SHAKE_EFFECT = "shake";
 	
+	public static final String KEYWORD_SIDE_SHAKE_EFFECT = "sideshake";
+	
 	public static final String KEYWORD_MIRROR_FILTER = "mirror";
+	
+	public static final String KEYWORD_GREENSCREEN_EFFECT = "greenscreen";
+	
+	public static final String KEYWORD_PAD_EFFECT = "pad";
 
 	/**
 	 * 
@@ -40,6 +49,12 @@ public class ChangeFactory {
 				return false;
 			case KEYWORD_MIRROR_FILTER:
 				return true;
+			case KEYWORD_GREENSCREEN_EFFECT:
+				return false;
+			case KEYWORD_SIDE_SHAKE_EFFECT:
+				return false;
+			case KEYWORD_PAD_EFFECT:
+				return false;
 			default:
 				return false;
 		}
@@ -55,6 +70,12 @@ public class ChangeFactory {
 				return new ShakeEffect(Integer.parseInt(details[0]), Integer.parseInt(details[1]));
 			case KEYWORD_MIRROR_FILTER:
 				return new MirrorFilter();
+			case KEYWORD_GREENSCREEN_EFFECT:
+				return new GreenscreenEffect(Integer.parseInt(details[0]));
+			case KEYWORD_SIDE_SHAKE_EFFECT:
+				return new SideShakeEffect(Integer.parseInt(details[0]), Integer.parseInt(details[1]));
+			case KEYWORD_PAD_EFFECT:
+				return new PadEffect(Integer.parseInt(details[0]), Integer.parseInt(details[1]));
 			default:
 				return null;
 		}

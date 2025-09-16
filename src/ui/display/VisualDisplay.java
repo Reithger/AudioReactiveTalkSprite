@@ -1,5 +1,7 @@
 package ui.display;
 
+import java.awt.Color;
+
 import ui.EventSender;
 import visual.composite.popout.PopoutWindow;
 
@@ -10,6 +12,9 @@ public abstract class VisualDisplay extends PopoutWindow{
 	public VisualDisplay(int width, int height) {
 		super(width, height);
 		// TODO Auto-generated constructor stub
+		this.toggleClickAndDragMode();
+		this.setBackgroundColor(new Color(255, 255, 255, 0));
+		this.setExitOnClose(false);
 	}
 	
 	@Override

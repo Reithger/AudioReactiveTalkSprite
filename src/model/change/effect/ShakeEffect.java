@@ -47,13 +47,17 @@ public class ShakeEffect implements Effect{
 		int newHei = startImage.getHeight(null);// + shakeRange;
 		BufferedImage copy = new BufferedImage(newWid, newHei, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D gr2 = copy.createGraphics();
+		gr2.drawImage(startImage, 0, 0, new Color(255, 255, 255, 0), null);
 		Random rand = new Random();
 		if(counter % intensitySpeed == 0) {
 			lastOffX = rand.nextInt(shakeRange) - shakeRange / 2;
 			lastOffY = rand.nextInt(shakeRange) - shakeRange / 2;
 		}
 		counter++;
-		gr2.drawImage(startImage, lastOffX, lastOffY, new Color(255, 255, 255, 255), null);
+		gr2.setColor(new Color(copy.getRGB(newWid - 2, 1)));
+		gr2.fillRect(0, 0, newWid, newHei);
+		gr2.drawImage(startImage, lastOffX, lastOffY, new Color(255, 255, 255, 0), null);
+
 		gr2.dispose();
 		
 		return copy;

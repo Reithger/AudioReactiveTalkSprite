@@ -185,7 +185,7 @@ public class AudioConfig {
 			return null;
 		}
 		affectedImage = baseImage.getScaledInstance(-1, -1, Image.SCALE_DEFAULT);
-		
+
 		for(Change e : effects) {
 			affectedImage = e.applyChange(affectedImage);
 		}

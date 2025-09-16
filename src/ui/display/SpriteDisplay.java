@@ -16,8 +16,8 @@ public class SpriteDisplay extends VisualDisplay{
 		super(wid, hei);
 		this.setTitle("PNGTuber Ada Made");
 		this.setExitOnClose(true);
+		this.setResizable(true);
 		//this.setFrameShapeDisc();
-		toggleClickAndDragMode();
 	}
 	
 	public void updateDisplayedImage(Image spriteImage) {
